@@ -396,23 +396,30 @@
     }
 
     function callScript(action, params, tentative) {
-      tentative = tentative || 1;
-      return fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify(Object.assign({ action: action }, params))
-      }).then(function(r) {
-        return r.json();
-      }).catch(function(err) {
-        if (tentative < 3) {
-          return new Promise(function(resolve) {
-            setTimeout(function() {
-              resolve(callScript(action, params, tentative + 1));
-            }, 2000);
-          });
-        }
-        throw err;
+  tentative = tentative || 1;
+  return fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(Object.assign({ action: action }, params))
+  }).then(function(r) {
+    return r.text(); // on lit en texte d'abord
+  }).then(function(text) {
+    try {
+      return JSON.parse(text); // puis on parse
+    } catch(e) {
+      console.log('Réponse brute : ' + text);
+      return text; // si pas du JSON valide on retourne le texte
+    }
+  }).catch(function(err) {
+    if (tentative < 3) {
+      return new Promise(function(resolve) {
+        setTimeout(function() {
+          resolve(callScript(action, params, tentative + 1));
+        }, 2000);
       });
     }
+    throw err;
+  });
+}
 
     function formatDate(input) {
       let v = input.value.replace(/\D/g, '');
