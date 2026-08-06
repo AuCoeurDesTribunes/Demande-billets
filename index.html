@@ -429,47 +429,50 @@
     }
 
     function loadJournees() {
-      const champ = document.getElementById('championnat').value;
-      const selJ = document.getElementById('journee');
-      const selM = document.getElementById('match');
-      const sectionJournee = document.getElementById('sectionJournee');
-      const champAutre = document.getElementById('champAutre');
-      const infoClub = document.getElementById('infoClub');
+  const champ = document.getElementById('championnat').value;
+  const selJ = document.getElementById('journee');
+  const selM = document.getElementById('match');
+  const sectionJournee = document.getElementById('sectionJournee');
+  const champAutre = document.getElementById('champAutre');
+  const infoClub = document.getElementById('infoClub');
 
-      infoClub.style.display = 'none';
-      infoClub.innerHTML = '';
+  infoClub.style.display = 'none';
+  infoClub.innerHTML = '';
 
-      if (champ === 'Autre') {
-        sectionJournee.style.display = 'none';
-        champAutre.style.display = 'block';
-        checkForm();
-        return;
-      }
+  if (champ === 'Autre') {
+    sectionJournee.style.display = 'none';
+    champAutre.style.display = 'block';
+    checkForm();
+    return;
+  }
 
-      sectionJournee.style.display = 'block';
-      champAutre.style.display = 'none';
-      selJ.innerHTML = '<option value="">&#9203; Chargement...</option>';
-      selJ.disabled = true;
-      selM.innerHTML = '<option value="">-- Choisir un match --</option>';
-      selM.disabled = true;
-      checkForm();
+  sectionJournee.style.display = 'block';
+  champAutre.style.display = 'none';
+  checkForm();
 
-      if (!champ) return;
+  // Nombre de journées selon le championnat
+  const nbJournees = {
+    'Premier League': 38,
+    'Serie A': 38,
+    'Liga': 38,
+    'Ligue 1': 34,
+    'Bundesliga': 34
+  };
 
-      callScript('getJournees', { championnat: champ }).then(function(journees) {
-        selJ.innerHTML = '<option value="">-- Choisir une journ\u00e9e --</option>';
-        journees.forEach(function(j) {
-          const opt = document.createElement('option');
-          opt.value = j;
-          const num = j.toString().replace(/\D/g, '');
-          opt.textContent = 'Journ\u00e9e ' + num;
-          selJ.appendChild(opt);
-        });
-        selJ.disabled = false;
-      }).catch(function() {
-        selJ.innerHTML = '<option value="">Erreur — Veuillez r\u00e9essayer</option>';
-      });
-    }
+  const nb = nbJournees[champ] || 38;
+
+  selJ.innerHTML = '<option value="">-- Choisir une journ\u00e9e --</option>';
+  for (var i = 1; i <= nb; i++) {
+    const opt = document.createElement('option');
+    opt.value = 'J' + i;
+    opt.textContent = 'Journ\u00e9e ' + i;
+    selJ.appendChild(opt);
+  }
+  selJ.disabled = false;
+
+  selM.innerHTML = '<option value="">-- Choisir un match --</option>';
+  selM.disabled = true;
+}
 
     function loadMatchs() {
       const champ = document.getElementById('championnat').value;
