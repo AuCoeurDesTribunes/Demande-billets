@@ -349,14 +349,17 @@
     };
 
     const CHAMPIONNATS_FLAGS = {
-      'Premier League': 'https://flagcdn.com/24x18/gb-eng.png',
-      'Ligue 1': 'https://flagcdn.com/24x18/fr.png',
-      'Liga': 'https://flagcdn.com/24x18/es.png',
-      'Serie A': 'https://flagcdn.com/24x18/it.png',
-      'Bundesliga': 'https://flagcdn.com/24x18/de.png'
-    };
+  'Premier League': 'https://flagcdn.com/24x18/gb-eng.png',
+  'Ligue 1': 'https://flagcdn.com/24x18/fr.png',
+  'Liga': 'https://flagcdn.com/24x18/es.png',
+  'Serie A': 'https://flagcdn.com/24x18/it.png',
+  'Bundesliga': 'https://flagcdn.com/24x18/de.png',
+  'Ligue des Champions': 'https://upload.wikimedia.org/wikipedia/fr/thumb/b/bf/UEFA_Champions_League_Logo_2.svg/24px-UEFA_Champions_League_Logo_2.svg.png'
+};
 
-    const CHAMPIONNATS = ['Bundesliga', 'Liga', 'Ligue 1', 'Premier League', 'Serie A'];
+
+    const CHAMPIONNATS = ['Bundesliga', 'Liga', 'Ligue 1', 'Ligue des Champions', 'Premier League', 'Serie A'];
+
 
     // Remplissage immédiat de la liste des championnats
     (function() {
@@ -452,12 +455,14 @@
 
   // Nombre de journées selon le championnat
   const nbJournees = {
-    'Premier League': 38,
-    'Serie A': 38,
-    'Liga': 38,
-    'Ligue 1': 34,
-    'Bundesliga': 34
-  };
+  'Premier League': 38,
+  'Serie A': 38,
+  'Liga': 38,
+  'Ligue 1': 34,
+  'Bundesliga': 34,
+  'Ligue des Champions': 8
+};
+
 
   const nb = nbJournees[champ] || 38;
 
