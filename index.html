@@ -479,41 +479,60 @@
   selM.disabled = true;
 }
 
-    function loadMatchs() {
-      const champ = document.getElementById('championnat').value;
-      const journee = document.getElementById('journee').value;
-      const selM = document.getElementById('match');
-      const infoClub = document.getElementById('infoClub');
+function loadMatchs() {
+  const champ = document.getElementById('championnat').value;
+  const journee = document.getElementById('journee').value;
+  const selM = document.getElementById('match');
+  const infoClub = document.getElementById('infoClub');
 
-      infoClub.style.display = 'none';
-      infoClub.innerHTML = '';
-      document.getElementById('dateMatch').value = '';
-      selM.innerHTML = '<option value="">&#9203; Chargement...</option>';
-      selM.disabled = true;
-      checkForm();
+  infoClub.style.display = 'none';
+  infoClub.innerHTML = '';
+  document.getElementById('dateMatch').value = '';
+  selM.innerHTML = '<option value="">&#9203; Chargement des matchs...</option>';
+  selM.disabled = true;
+  checkForm();
 
-      if (!journee) return;
+  if (!journee) return;
 
-      callScript('getMatchs', { championnat: champ, journee: journee }).then(function(matchs) {
-        selM.innerHTML = '<option value="">-- Choisir un match --</option>';
-        if (matchs && matchs.length > 0) {
-          matchs.forEach(function(m) {
-            const opt = document.createElement('option');
-            opt.value = m.domicile + ' vs ' + m.exterieur;
-            opt.dataset.date = m.dateISO || '';
-            const dateStr = m.date ? ' \u2014 ' + new Date(m.date).toLocaleDateString('fr-FR') : '';
-            opt.textContent = m.domicile + ' vs ' + m.exterieur + dateStr;
-            selM.appendChild(opt);
-          });
-          selM.disabled = false;
-        } else {
-          selM.innerHTML = '<option value="">Aucun match trouv\u00e9</option>';
-        }
-        checkForm();
-      }).catch(function() {
-        selM.innerHTML = '<option value="">Erreur — Veuillez r\u00e9essayer</option>';
-      });
+  // Timeout de sécurité — si pas de réponse après 15s, propose de réessayer
+  const timeout = setTimeout(function() {
+    if (selM.disabled) {
+      selM.innerHTML = '<option value="">&#10060; D\u00e9lai d\u00e9pass\u00e9 — Appuyez pour r\u00e9essayer</option>';
+      selM.disabled = false;
+      selM.addEventListener('click', function retryLoad() {
+        selM.removeEventListener('click', retryLoad);
+        loadMatchs();
+      }, { once: true });
     }
+  }, 15000);
+
+  callScript('getMatchs', { championnat: champ, journee: journee }).then(function(matchs) {
+    clearTimeout(timeout);
+    selM.innerHTML = '<option value="">-- Choisir un match --</option>';
+    if (matchs && Array.isArray(matchs) && matchs.length > 0) {
+      matchs.forEach(function(m) {
+        const opt = document.createElement('option');
+        opt.value = m.domicile + ' vs ' + m.exterieur;
+        opt.dataset.date = m.dateISO || '';
+        const dateStr = m.date ? ' \u2014 ' + new Date(m.date).toLocaleDateString('fr-FR') : '';
+        opt.textContent = m.domicile + ' vs ' + m.exterieur + dateStr;
+        selM.appendChild(opt);
+      });
+      selM.disabled = false;
+    } else {
+      selM.innerHTML = '<option value="">Aucun match trouv\u00e9</option>';
+    }
+    checkForm();
+  }).catch(function() {
+    clearTimeout(timeout);
+    selM.innerHTML = '<option value="">&#10060; Erreur — Touchez pour r\u00e9essayer</option>';
+    selM.disabled = false;
+    selM.addEventListener('click', function retryLoad() {
+      selM.removeEventListener('click', retryLoad);
+      loadMatchs();
+    }, { once: true });
+  });
+}
 
     function onMatchChange() {
       const matchSel = document.getElementById('match');
